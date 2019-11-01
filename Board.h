@@ -22,7 +22,7 @@
 //	int y;
 //	Crdnts(int _x, int _y) : x(_x), y(_y) {}
 //};
-//пока не нужны
+//РїРѕРєР° РЅРµ РЅСѓР¶РЅС‹
 
 class Board
 {
@@ -37,7 +37,7 @@ public:
 	Board();
 	Board(std::string fen);
 	void PrintBoard();
-	void Set_Figure_At(int figure, int x, int y);
+	void Set_Figure_At(int figure,int x,int y);
 	void Info_Digni(int x, int y);
 	void Info_Color(int x, int y);
 	void Init_board();

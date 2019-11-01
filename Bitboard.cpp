@@ -4,7 +4,7 @@ void Board_Print_Text(UINT64 arr[], const int size);
 
 BitBoard::BitBoard()
 {
-	for (int i = 0; i < 12; i++)
+	for (int i = 0; i < 12 ; i++)
 	{
 		if (i < 6)
 		{
@@ -12,13 +12,13 @@ BitBoard::BitBoard()
 		}
 		else
 		{
-			bit_board[i].figure_and_color = ((i + 1) - 6) | BLACK;
+			bit_board[i].figure_and_color = ((i + 1)-6) | BLACK;
 		}
 	}
 	init_coor_figure();
 	init_all_bitboard();
 	init_all_coor_bitboard();
-	//init_knight_attacks();
+	init_knight_attacks();
 	//init_lines_attacks();
 }
 
@@ -30,8 +30,8 @@ BitBoard::BitBoard(const BitBoard& b)
 	}
 	init_all_bitboard();
 	init_all_coor_bitboard();
-	//init_knight_attacks();
-	//init_lines_attacks(1);
+	init_knight_attacks();
+	//init_lines_attacks();
 }
 
 BitBoard::~BitBoard()
@@ -57,7 +57,7 @@ void BitBoard::init_coor_figure()
 		case WHITE | ROOK:
 			bit_board[i].coor = 129;
 			break;
-		case WHITE | QUEEN:
+		case WHITE | QUEEN :
 			bit_board[i].coor = 16;
 			break;
 		case WHITE | KING:
@@ -133,7 +133,7 @@ void BitBoard::print_bitboard()
 		{
 			std::cout << std::endl;
 		}
-		std::cout << butboard[i - 1];
+		std::cout << butboard[i-1];
 	}
 }
 
@@ -143,7 +143,7 @@ int BitBoard::set_figure_at(std::string movee)
 	int b = 'h' - movee[0];
 	//UINT64 c = pow(2, (a + b));
 	//white_occupied |= c;
-
+	
 	return a + b;
 }
 
@@ -214,8 +214,8 @@ void BitBoard::init_knight_attacks()
 		bit_board[1].figure_move[i] = knight_attacks[i];
 		bit_board[7].figure_move[i] = knight_attacks[i];
 	}
-
-	Board_Print_Text(knight_attacks, 64);
+	
+	Board_Print_Text(knight_attacks,64);
 	//for (int i = 0; i < 64; i++)
 	//	{
 	//		white_occupied |= knight_attacks[i];
@@ -225,7 +225,7 @@ void BitBoard::init_knight_attacks()
 	//	}
 }
 
-void BitBoard::init_lines_attacks(int k)
+void BitBoard::init_lines_attacks(int a)
 {
 	UINT64 plus1[64] = {
 		254, 252, 248, 240, 224, 192, 128, 0,
@@ -271,22 +271,9 @@ void BitBoard::init_lines_attacks(int k)
 		282578800148737, 565157600297474, 1130315200594948, 2260630401189896, 4521260802379792, 9042521604759584, 18085043209519168, 36170086419038336,
 	};
 
-	UINT64 rook ;
+	int a = 25;
 
-	for (int j = 0; j < 64; j++)
-	{
-		UINT64 H6 = pow(2, 36);
-		rook = (plus1[j] | minus1[j] | plus8[j] | minus8[j]);
-
-		UINT64 blockers_figure = (plus1[j] | minus1[j] | plus8[j] | minus8[j]) & H6;
-		if (blockers_figure != 0)
-		{
-			int counter = blockers(blockers_figure);
-			rook = rook ^ plus8[counter];
-		}
-
-		rook = rook | H6;
-
+	UINT64 rook = (plus1[a] | minus1[a] | plus8[a] | minus8[a]);
 		for (int i = 0; i < 64; i++)
 		{
 			std::cout << rook % 2;
@@ -296,26 +283,10 @@ void BitBoard::init_lines_attacks(int k)
 			}
 			rook = rook / 2;
 		}
-		rook = 0;
-		std::cout << std::endl << std::endl;
-		std::cin.get();
-	}
-}
-int BitBoard::blockers(UINT64 block)
-{
-	UINT64 blockers = block;
-	for (int i = 0; i < 64; i++)
-	{
-		if (blockers % 2 != 0)
-		{
-			return i;
-		}
-		blockers /= 2;
-	}
-	return 0;
 };
 
-void Board_Print_Text(UINT64 arr[], const int size)
+
+void Board_Print_Text(UINT64 arr[],const int size)
 {
 	for (int j = 0; j < 64; j++)
 	{
@@ -334,12 +305,12 @@ void Board_Print_Text(UINT64 arr[], const int size)
 	}
 }
 
-void BoardUnitTest_001()
-{
-	BitBoard b;
-	b.init_lines_attacks(2);
-	std::cin.get();
-}
+//void BoardUnitTest_001()
+//{
+//	BitBoard b;
+//	b.init_lines_attacks();
+//	std::cin.get();
+//}
 
 void BoardUnitTest_002()
 {
@@ -360,12 +331,12 @@ void BoardUnitTest_003()
 	b.init_all_coor_bitboard();
 	std::cin >> move;
 	std::cout << std::endl;
-
+	
 	a = b.set_figure_at(move);
 	UINT64 c = pow(2, a);
 	std::cin.get();
 	std::cout << std::endl;
-
+	
 	b.init_lines_attacks(a);
 
 
@@ -373,12 +344,7 @@ void BoardUnitTest_003()
 
 void BoardUnitTest()
 {
-	std::cout << "New" << std::endl;
-	BoardUnitTest_001();
-
-	std::cout << "Now knight_attacks" <<
-		std::endl << std::endl;
-
-	BoardUnitTest_002();
-	//BoardUnitTest_003();
+	//BoardUnitTest_001();
+	//BoardUnitTest_002();
+	BoardUnitTest_003();
 }

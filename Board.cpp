@@ -99,18 +99,18 @@ void Board::PrintBoard()
 	{
 		for (int j = 0; j < 8; j++)
 		{
-			if ((b_board[i][j] == 9) | (b_board[i][j] == 0))
+			if ((b_board[i][j] == 9) | (b_board[i][j] == 0) )
 			{
 				std::cout << b_board[i][j] << "  ";
 			}
 			else
-				std::cout << b_board[i][j] << " ";
+			std::cout << b_board[i][j] << " " ;
 		}
 		std::cout << std::endl;
 	}
 }
 
-void Board::Set_Figure_At(int figure, int x, int y)
+void Board::Set_Figure_At(int figure,int x,int y)
 {
 
 	b_board[x][y] = figure;
@@ -118,12 +118,12 @@ void Board::Set_Figure_At(int figure, int x, int y)
 
 void Board::Info_Color(int x, int y)
 {
-	std::cout << "Öâåò ôèãóðû íà ïîëå ñ êîîðäèíàòàì x = " << x << " y = " << y << " - "
+	std::cout << "Ð¦Ð²ÐµÑ‚ Ñ„Ð¸Ð³ÑƒÑ€Ñ‹ Ð½Ð° Ð¿Ð¾Ð»Ðµ Ñ ÐºÐ¾Ð¾Ñ€Ð´Ð¸Ð½Ð°Ñ‚Ð°Ð¼ x = " << x << " y = " << y << " - "
 		<< (b_board[x][y] & COLOR_BITS) << std::endl;
 }
 
 void Board::Info_Digni(int x, int y)
 {
-	std::cout << "Ôèãóðà íà ïîëå ñ êîîðäèíàòàì x = " << x << " y = " << y << " - "
+	std::cout << "Ð¤Ð¸Ð³ÑƒÑ€Ð° Ð½Ð° Ð¿Ð¾Ð»Ðµ Ñ ÐºÐ¾Ð¾Ñ€Ð´Ð¸Ð½Ð°Ñ‚Ð°Ð¼ x = " << x << " y = " << y << " - "
 		<< (b_board[x][y] & DIGNI_BITS) << std::endl;
 }
