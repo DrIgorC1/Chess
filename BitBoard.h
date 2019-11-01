@@ -12,7 +12,7 @@ struct Struct_Bitboard
 {
 	int figure_and_color;
 	UINT64 coor;
-	UINT64 figure_move[64];// Р”Р°Р»РµРµ РґРµР»Р°РµРј РјР°СЃСЃРёРІ С…РѕРґРѕРІ
+	UINT64 figure_move[64];// Далее делаем массив ходов
 };
 
 class BitBoard
@@ -27,7 +27,7 @@ private:
 	int state[64];
 
 public:
-	
+
 	BitBoard();
 	BitBoard(const BitBoard& B);
 	~BitBoard();
@@ -39,7 +39,8 @@ public:
 	int set_figure_at(std::string movee);
 	void init_figure_attacks();
 	void init_knight_attacks();
-	void init_lines_attacks(int a);
+	void init_lines_attacks(int k);
+	int blockers(UINT64 block);
 };
 
 void BoardUnitTest();
