@@ -1,111 +1,182 @@
 #include "BitBoard.h"
 
-void Board_Print_Text(UINT64 arr[], const int size);
-
 BitBoard::BitBoard()
 {
-	for (int i = 0; i < 12 ; i++)
-	{
-		if (i < 6)
-		{
-			bit_board[i].figure_and_color = (i + 1) | WHITE;
-		}
-		else
-		{
-			bit_board[i].figure_and_color = ((i + 1)-6) | BLACK;
-		}
-	}
-	init_coor_figure();
-	init_all_bitboard();
-	init_all_coor_bitboard();
-	init_knight_attacks();
-	//init_lines_attacks();
-}
-
-BitBoard::BitBoard(const BitBoard& b)
-{
-	for (int i = 0; i < 12; i++)
-	{
-		this->bit_board[i] = b.bit_board[i];
-	}
-	init_all_bitboard();
-	init_all_coor_bitboard();
-	init_knight_attacks();
-	//init_lines_attacks();
-}
-
-BitBoard::~BitBoard()
-{
 
 }
 
-void BitBoard::init_coor_figure()
+BitBoard::BitBoard(std::string fen) : b_fen(fen)
 {
-	for (int i = 0; i < 12; i++)
+	init_board();
+}
+
+void BitBoard::init_board()
+{
+	int c = 0;//counter
+	for (int i = 0; i < 8; i++)
 	{
-		switch (bit_board[i].figure_and_color)
+		for (int j = 0; j < 8; j++)
 		{
-		case WHITE | PAWN:
-			bit_board[i].coor = 65280;
-			break;
-		case WHITE | KNIGHT:
-			bit_board[i].coor = 66;
-			break;
-		case WHITE | BISHOP:
-			bit_board[i].coor = 36;
-			break;
-		case WHITE | ROOK:
-			bit_board[i].coor = 129;
-			break;
-		case WHITE | QUEEN :
-			bit_board[i].coor = 16;
-			break;
-		case WHITE | KING:
-			bit_board[i].coor = 8;
-			break;
-		case BLACK | PAWN:
-			bit_board[i].coor = 71776119061217280;
-			break;
-		case BLACK | KNIGHT:
-			bit_board[i].coor = 4755801206503243776;
-			break;
-		case BLACK | BISHOP:
-			bit_board[i].coor = 2594073385365405696;
-			break;
-		case BLACK | ROOK:
-			bit_board[i].coor = 9295429630892703744;
-			break;
-		case BLACK | QUEEN:
-			bit_board[i].coor = 1152921504606846976;
-			break;
-		case BLACK | KING:
-			bit_board[i].coor = 576460752303423488;
-			break;
-		default:
-			bit_board[i].coor = 1;
-			break;
+			if (b_fen[c] > '0' && b_fen[c] < '9')
+			{
+				continue;
+			}
+			else
+			{
+				set_icoor_figure(i,j,c);
+
+			}
+			c++;
 		}
+		c++;
 	}
+}
+
+void BitBoard::set_icoor_figure(int x, int y, int counter)
+{
+	switch (b_fen[counter])
+	{
+	case 'r':
+		init_black_rook(x + (y * 8));
+		break;
+	case 'b':
+		init_black_bishop(x + (y * 8));
+		break;
+	case 'n':
+		init_black_knight(x + (y * 8));
+		break;
+	case 'q':
+		init_black_queen(x + (y * 8));
+		break;
+	case 'k':
+		init_black_king(x + (y * 8));
+		break;
+	case 'p':
+		init_black_pawn(x + (y * 8));
+		break;
+	case 'R':
+		init_white_rook(x + (y * 8));
+		break;
+	case 'B':
+		init_white_bishop(x + (y * 8));
+		break;
+	case 'N':
+		init_white_knight(x + (y * 8));
+		break;
+	case 'Q':
+		init_white_queen(x + (y * 8));
+		break;
+	case 'K':
+		init_white_king(x + (y * 8));
+		break;
+	case 'P':
+		init_white_pawn(x + (y * 8));
+		break;
+	default:
+		break;
+	}
+}
+
+
+void BitBoard::init_white_pawn(int coor)
+{
+	white_pawn.icoor = coor;
+	white_pawn.ucoor += pow(2, coor);
+	//white_pawn.figure_move += init_pawn_move(white_pawn.icoor);
+}
+
+void BitBoard::init_white_knight(int coor)
+{
+	white_knight.icoor = coor;
+	white_knight.ucoor += pow(2, coor);
+	white_knight.figure_move += init_knight_move(white_knight.icoor);
+}
+
+void BitBoard::init_white_bishop(int coor)
+{
+	white_bishop.icoor = coor;
+	white_bishop.ucoor += pow(2, coor);
+	white_bishop.figure_move += init_diag_attacks(white_bishop.icoor);
+}
+
+void BitBoard::init_white_rook(int coor)
+{
+	white_rook.icoor = coor;
+	white_rook.ucoor += pow(2, coor);
+	white_rook.figure_move += init_lines_attacks(white_rook.icoor);
+}
+
+void BitBoard::init_white_queen(int coor)
+{
+	white_queen.icoor = coor;
+	white_queen.ucoor += pow(2, coor);
+	white_queen.figure_move += init_lines_attacks(white_queen.icoor);
+	white_queen.figure_move += init_diag_attacks(white_queen.icoor);
+}
+
+void BitBoard::init_white_king(int coor)
+{
+	white_king.icoor = coor;
+	white_king.ucoor += pow(2, coor);
+	///white_king.figure_move += init_som
+}
+
+void BitBoard::init_black_pawn(int coor)
+{
+	black_pawn.icoor = coor;
+	black_pawn.ucoor += pow(2, coor);
+	black_pawn.figure_move += init_knight_move(black_pawn.icoor);
+	////black_pawn.figure_move += init_pawn_move(black_pawn.icoor);
+}
+
+void BitBoard::init_black_knight(int coor)
+{
+	black_knight.icoor = coor;
+	black_knight.ucoor += pow(2, coor);
+	black_knight.figure_move += init_knight_move(black_knight.icoor);
+}
+
+void BitBoard::init_black_bishop(int coor)
+{
+	black_bishop.icoor = coor;
+	black_bishop.ucoor += pow(2, coor);
+	black_bishop.figure_move += init_diag_attacks(black_bishop.icoor);
+}
+
+void BitBoard::init_black_rook(int coor)
+{
+	black_rook.icoor = coor;
+	black_rook.ucoor += pow(2, coor);
+	black_rook.figure_move += init_lines_attacks(black_knight.icoor);
+}
+
+void BitBoard::init_black_queen(int coor)
+{
+	black_queen.icoor = coor;
+	black_queen.ucoor += pow(2, coor);
+	black_queen.figure_move += init_lines_attacks(black_queen.icoor);
+	black_queen.figure_move += init_diag_attacks(black_queen.icoor);
+}
+
+void BitBoard::init_black_king(int coor)
+{
+	black_king.icoor = coor;
+	black_king.ucoor += pow(2, coor);
+	///black_king.figure_move += init_som
 }
 
 void BitBoard::init_all_bitboard()
 {
-	white_occupied = 0;
-	black_occupied = 0;
+	white_occupied = white_pawn.ucoor | white_knight.ucoor |  white_bishop.ucoor 
+		| white_rook.ucoor |  white_queen.ucoor |  white_king.ucoor;
 
-	for (int i = 0; i < 6; i++)
-	{
-		white_occupied = white_occupied | bit_board[i].coor;
-	}
-	for (int i = 6; i < 12; i++)
-	{
-		black_occupied = black_occupied | bit_board[i].coor;
-	}
+	black_occupied = black_pawn.ucoor | black_knight.ucoor | black_bishop.ucoor
+		| black_rook.ucoor | black_queen.ucoor | black_king.ucoor;
 }
 
 void BitBoard::init_all_coor_bitboard()
 {
-	UINT64 all_coor[64] = {
+	U64 all_coor[64] = {
 		1, 2, 4, 8, 16, 32, 64, 128,
 		256, 512, 1024, 2048, 4096, 8192, 16384, 32768,
 		65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608,
@@ -115,92 +186,11 @@ void BitBoard::init_all_coor_bitboard()
 		281474976710656, 562949953421312, 1125899906842624, 2251799813685248, 4503599627370496, 9007199254740992, 18014398509481984, 36028797018963968,
 		72057594037927936, 144115188075855872, 288230376151711744, 576460752303423488, 1152921504606846976, 2305843009213693952, 4611686018427387904, 9223372036854775808,
 	};
-
 }
 
-void BitBoard::print_bitboard()
+U64 BitBoard::init_knight_move(int icoor)
 {
-	all_occupied = white_occupied | black_occupied; // this black_occupied | white_occupied
-	bool butboard[64];
-	for (int i = 0; i < 64; i++)
-	{
-		butboard[i] = all_occupied % 2;
-		all_occupied = all_occupied / 2;
-	}
-	for (int i = 64; i > 0; i--)
-	{
-		if ((i % 8 == 0) & (i >= 8))
-		{
-			std::cout << std::endl;
-		}
-		std::cout << butboard[i-1];
-	}
-}
-
-int BitBoard::set_figure_at(std::string movee)
-{
-	int a = (movee[1] - 49) * 8;
-	int b = 'h' - movee[0];
-	//UINT64 c = pow(2, (a + b));
-	//white_occupied |= c;
-	
-	return a + b;
-}
-
-void BitBoard::init_figure_attacks()
-{
-	for (int i = 0; i < 12; i++)
-	{
-		switch (bit_board[i].figure_and_color)
-		{
-		case WHITE | PAWN:
-			bit_board[i].coor = 65280;
-			break;
-		case WHITE | KNIGHT:
-			init_knight_attacks();
-			break;
-		case WHITE | BISHOP:
-			bit_board[i].coor = 36;
-			break;
-		case WHITE | ROOK:
-			init_lines_attacks(2);
-			break;
-		case WHITE | QUEEN:
-			init_lines_attacks(2);
-			// init_diag_attacks()/////;
-			break;
-		case WHITE | KING:
-			bit_board[i].coor = 8;
-			break;
-		case BLACK | PAWN:
-			bit_board[i].coor = 71776119061217280;
-			break;
-		case BLACK | KNIGHT:
-			init_knight_attacks();
-			break;
-		case BLACK | BISHOP:
-			bit_board[i].coor = 2594073385365405696;
-			break;
-		case BLACK | ROOK:
-			init_lines_attacks(2);
-			break;
-		case BLACK | QUEEN:
-			init_lines_attacks(2);//!!!
-			// init_diag_attacks()/////;
-			break;
-		case BLACK | KING:
-			bit_board[i].coor = 576460752303423488;
-			break;
-		default:
-			bit_board[i].coor = 1;
-			break;
-		}
-	}
-}
-
-void BitBoard::init_knight_attacks()
-{
-	UINT64 knight_attacks[64] = { 132096, 329728, 659712, 1319424, 2638848, 5277696, 10489856, 4202496,
+	static U64 knight_attacks[64] = { 132096, 329728, 659712, 1319424, 2638848, 5277696, 10489856, 4202496,
 		33816580, 84410376, 168886289, 337772578, 675545156, 1351090312, 2685403152,
 		8657044482, 21609056261, 43234889994, 86469779988, 172939559976, 345879119952, 687463207072,275414786112,
 		2216203387392, 5531918402816, 11068131838464, 22136263676928, 44272527353856, 88545054707712, 175990581010432, 70506187341824,
@@ -209,25 +199,13 @@ void BitBoard::init_knight_attacks()
 		288234782788157440, 576469569871282176, 1224997833292120064, 2449995666584240128, 4899991333168480256, 9800114573372555264, 1152939715268182016, 2305878331024736256,
 		1128098930098176, 2257297371824128, 4796069720358912, 9592139440717824, 19184278881435648, 38368557762871296, 4679521487814656, 9077567998918656
 	};
-	for (int i = 0; i < 64; i++)
-	{
-		bit_board[1].figure_move[i] = knight_attacks[i];
-		bit_board[7].figure_move[i] = knight_attacks[i];
-	}
-	
-	Board_Print_Text(knight_attacks,64);
-	//for (int i = 0; i < 64; i++)
-	//	{
-	//		white_occupied |= knight_attacks[i];
-	//		white_occupied ^= knight_attacks[i];
-	//		std::cout << std::endl << std::endl;
-	//		std::cin.get();
-	//	}
+	return knight_attacks[icoor];
 }
 
-void BitBoard::init_lines_attacks(int a)
+
+U64 BitBoard::init_lines_attacks(int icoor)
 {
-	UINT64 plus1[64] = {
+	static U64 plus1[64] = {
 		254, 252, 248, 240, 224, 192, 128, 0,
 		65024, 64512, 63488, 61440, 57344, 49152, 32768, 0,
 		16646144, 16515072, 16252928, 15728640, 14680064, 12582912, 8388608, 0 ,
@@ -238,7 +216,7 @@ void BitBoard::init_lines_attacks(int a)
 		18302628885633695744, 18158513697557839872, 17870283321406128128, 17293822569102704640, 16140901064495857664, 13835058055282163712, 9223372036854775808, 0
 	};
 
-	UINT64 minus1[64] = {
+	static U64 minus1[64] = {
 		0, 1, 3, 7, 15, 31, 63, 127,
 		0, 256, 768, 1792, 3840, 7936, 16128, 32512,
 		0, 65536, 196608, 458752, 983040, 2031616, 4128768, 8323072,
@@ -249,7 +227,7 @@ void BitBoard::init_lines_attacks(int a)
 		0, 72057594037927936, 216172782113783808, 504403158265495552, 1080863910568919040, 2233785415175766016, 4539628424389459968, 9151314442816847872,
 	};
 
-	UINT64 plus8[64] = {
+	static U64 plus8[64] = {
 		72340172838076672, 144680345676153344, 289360691352306688, 578721382704613376, 1157442765409226752, 2314885530818453504, 4629771061636907008, 9259542123273814016,
 		72340172838076416, 144680345676152832, 289360691352305664, 578721382704611328, 1157442765409222656, 2314885530818445312, 4629771061636890624, 9259542123273781248,
 		72340172838010880, 144680345676021760, 289360691352043520, 578721382704087040, 1157442765408174080, 2314885530816348160, 4629771061632696320, 9259542123265392640,
@@ -260,7 +238,7 @@ void BitBoard::init_lines_attacks(int a)
 		0, 0, 0, 0, 0, 0, 0, 0,
 	};
 
-	UINT64 minus8[64] = {
+	static U64 minus8[64] = {
 		0, 0, 0, 0, 0, 0, 0, 0,
 		1, 2, 4, 8, 16, 32, 64, 128,
 		257, 514, 1028, 2056, 4112, 8224, 16448, 32896,
@@ -271,80 +249,63 @@ void BitBoard::init_lines_attacks(int a)
 		282578800148737, 565157600297474, 1130315200594948, 2260630401189896, 4521260802379792, 9042521604759584, 18085043209519168, 36170086419038336,
 	};
 
-	int a = 25;
-
-	UINT64 rook = (plus1[a] | minus1[a] | plus8[a] | minus8[a]);
-		for (int i = 0; i < 64; i++)
-		{
-			std::cout << rook % 2;
-			if ((i > 6) & ((i + 1) % 8 == 0))
-			{
-				std::cout << std::endl;
-			}
-			rook = rook / 2;
-		}
-};
-
-
-void Board_Print_Text(UINT64 arr[],const int size)
+	return plus1[icoor] | minus1[icoor] | plus8[icoor] | minus8[icoor];
+}
+U64 BitBoard::init_diag_attacks(int icoor)
 {
-	for (int j = 0; j < 64; j++)
-	{
-		for (int i = 0; i < size; i++)
-		{
-			std::cout << arr[j] % 2;
-			if ((i > 6) & (((i + 1) % 8) == 0))
-			{
-				std::cout << std::endl;
-			}
-			arr[j] = arr[j] / 2;
-		}
+	static U64 plus9[64] = {
+		9241421688590303744, 36099303471055872, 141012904183808, 550831656960, 2151686144, 8404992, 32768, 0,
+		4620710844295151616, 9241421688590303232, 36099303471054848, 141012904181760, 550831652864, 2151677952, 8388608, 0,
+		2310355422147510272,4620710844295020544,9241421688590041088,36099303470530560,275414777856,550829555712,2147483648,0,
+		1155177711056977920,2310355422113955840,4620710844227911680,9241421688455823360,36099303202095104,141012366262272,549755813888,0,
+		577588851233521664,1155177702467043328,2310355404934086656,4620710809868173312,9241421619736346624,36099165763141632,140737488355328,0,
+		288793326105133056,577586652210266112,1155173304420532224,2310346608841064448,4620693217682128896,9241386435364257792,36028797018963968,0,
+		144115188075855872, 288230376151711744, 576460752303423488, 1152921504606846976, 2305843009213693952, 4611686018427387904, 9223372036854775808,0,
+		0, 0, 0, 0, 0, 0, 0, 0
+	};
 
-		std::cout << std::endl << std::endl;
-		std::cin.get();
-	}
+	static U64 plus7[64] = {
+		0,256,66048,16909312,4328785920,1108169199616,283691315109888,72624976668147712,
+		0,8454144,2164391936,554084597760,141845657550848,36312488334065664,9295997013522907136,145249953336262656,
+		0,16777216,4328521728,1108168671232,283691314053120,72624976666034176,145249953332068352,290499906664136704,
+		0, 4294967296,1108101562368,283691179835392,72624976397598720,145249952795197440,290499905590394880,580999811180789760,
+		0,1099511627776,283673999966208,72624942037860352,145249884075720704,290499768151441408,580999536302882816,1161999072605765632,
+		0, 281474976710656,72620543991349248,145241087982698496,290482175965396992,580964351930793984,1161928703861587968,2323857407723175936,
+		0,72057594037927936,144115188075855872,288230376151711744,576460752303423488,1152921504606846976,2305843009213693952,4611686018427387904,
+		0, 0, 0, 0, 0, 0, 0, 0
+	};
+
+	static U64 minus9[64] = {
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 1,2,4,8,16,32,64,
+		0, 256,513,1026,2052,4104,8208,16416,
+		0, 65536,131328,262657,525314,1050628,2101256,4202512,
+		0, 16777216,33619968,67240192,134480385,268960770,537921540,1075843080,
+		0, 4294967296,8606711808,17213489152,34426978560,68853957121,137707914242,275415828484,
+		0, 1099511627776,2203318222848,4406653222912,8813306511360,17626613022976,35253226045953,70506452091906,
+		0, 281474976710656,564049465049088,1128103225065472,2256206466908160,4512412933881856,9024825867763968,18049651735527937,
+	};
+
+	static U64 minus7[64] = {
+		0, 0, 0, 0, 0, 0, 0, 0,
+		2,4,8,16,32,64,128,0,
+		516,1032,2064,4128,8256,16512,32768,0,
+		132104,264208,528416,1056832,2113664,4227072,8388608,0,
+		33818640, 67637280,135274560,270549120,541097984,1082130432,2147483648,0,
+		8657571872,17315143744,34630287488,69260574720,138521083904,277025390592,549755813888,0,
+		2216338399296,4432676798592,8865353596928,17730707128320,35461397479424,70918499991552,140737488355328,0,
+		567382630219904,1134765260439552,2269530520813568,4539061024849920,9078117754732544,18155135997837312,36028797018963968,0
+	};
+
+	return plus9[icoor] | plus7[icoor] | minus9[icoor] | minus7[icoor];
 }
 
-//void BoardUnitTest_001()
-//{
-//	BitBoard b;
-//	b.init_lines_attacks();
-//	std::cin.get();
-//}
-
-void BoardUnitTest_002()
+void BoardUnitTest_001()
 {
-	BitBoard b;
-	b.init_knight_attacks();
-	std::cin.get();
-
-}
-
-void BoardUnitTest_003()
-{
-
-	BitBoard b;
-	UINT64 blockers;
-	std::string move;
-	int a;
-
-	b.init_all_coor_bitboard();
-	std::cin >> move;
-	std::cout << std::endl;
-	
-	a = b.set_figure_at(move);
-	UINT64 c = pow(2, a);
-	std::cin.get();
-	std::cout << std::endl;
-	
-	b.init_lines_attacks(a);
-
-
 }
 
 void BoardUnitTest()
 {
-	//BoardUnitTest_001();
-	//BoardUnitTest_002();
-	BoardUnitTest_003();
+	BoardUnitTest_001();
+
 }
