@@ -43,3 +43,4 @@ public:
 	void Init_board();
 	void set_Figure_In(int x, int y, int counter);
 };
+		

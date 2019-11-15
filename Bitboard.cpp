@@ -13,64 +13,60 @@ BitBoard::BitBoard(std::string fen) : b_fen(fen)
 void BitBoard::init_board()
 {
 	int c = 0;//counter
-	for (int i = 0; i < 8; i++)
+	for (int j = 0; j < 64; j++)
 	{
-		for (int j = 0; j < 8; j++)
+		if (b_fen[c] > '0' && b_fen[c] < '9')
 		{
-			if (b_fen[c] > '0' && b_fen[c] < '9')
-			{
-				continue;
-			}
-			else
-			{
-				set_icoor_figure(i,j,c);
-
-			}
-			c++;
+			j += b_fen[c] - '1';
+		}
+		else
+		{
+			set_icoor_figure(j,c);
 		}
 		c++;
 	}
+	color_move = b_fen[c];
 }
 
-void BitBoard::set_icoor_figure(int x, int y, int counter)
+void BitBoard::set_icoor_figure(int icoor, int counter)
 {
 	switch (b_fen[counter])
 	{
 	case 'r':
-		init_black_rook(x + (y * 8));
+		init_black_rook(icoor);
 		break;
 	case 'b':
-		init_black_bishop(x + (y * 8));
+		init_black_bishop(icoor);
 		break;
 	case 'n':
-		init_black_knight(x + (y * 8));
+		init_black_knight(icoor);
 		break;
 	case 'q':
-		init_black_queen(x + (y * 8));
+		init_black_queen(icoor);
 		break;
 	case 'k':
-		init_black_king(x + (y * 8));
+		init_black_king(icoor);
 		break;
 	case 'p':
-		init_black_pawn(x + (y * 8));
+		init_black_pawn(icoor);
 		break;
 	case 'R':
-		init_white_rook(x + (y * 8));
+		init_white_rook(icoor);
 		break;
 	case 'B':
-		init_white_bishop(x + (y * 8));
+		init_white_bishop(icoor);
 		break;
 	case 'N':
-		init_white_knight(x + (y * 8));
+		init_white_knight(icoor);
 		break;
 	case 'Q':
-		init_white_queen(x + (y * 8));
+		init_white_queen(icoor);
 		break;
 	case 'K':
-		init_white_king(x + (y * 8));
+		init_white_king(icoor);
 		break;
 	case 'P':
-		init_white_pawn(x + (y * 8));
+		init_white_pawn(icoor);
 		break;
 	default:
 		break;
@@ -80,7 +76,7 @@ void BitBoard::set_icoor_figure(int x, int y, int counter)
 
 void BitBoard::init_white_pawn(int coor)
 {
-	white_pawn.icoor = coor;
+	white_pawn.icoor = coor;			
 	white_pawn.ucoor += pow(2, coor);
 	//white_pawn.figure_move += init_pawn_move(white_pawn.icoor);
 }
@@ -165,6 +161,117 @@ void BitBoard::init_black_king(int coor)
 	///black_king.figure_move += init_som
 }
 
+void BitBoard::processed_figure_move()
+{
+	static U64 all_coor[64] = {
+		1, 2, 4, 8, 16, 32, 64, 128,
+		256, 512, 1024, 2048, 4096, 8192, 16384, 32768,
+		65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608,
+		16777216, 33554432, 67108864, 134217728, 268435456, 536870912, 1073741824, 2147483648,
+		4294967296, 8589934592, 17179869184, 34359738368, 68719476736, 137438953472, 274877906944, 549755813888,
+		1099511627776, 2199023255552, 4398046511104, 8796093022208, 17592186044416, 35184372088832, 70368744177664, 140737488355328,
+		281474976710656, 562949953421312, 1125899906842624, 2251799813685248, 4503599627370496, 9007199254740992, 18014398509481984, 36028797018963968,
+		72057594037927936, 144115188075855872, 288230376151711744, 576460752303423488, 1152921504606846976, 2305843009213693952, 4611686018427387904, 9223372036854775808,
+	};
+
+	for (int i = 0; i < 64; i++)
+	{
+		U64 temporary_variable_1 = all_coor[i] & white_knight.figure_move;
+		U64 temporary_variable_2 = all_coor[i] & white_bishop.figure_move;
+		U64 temporary_variable_3 = all_coor[i] & white_rook.figure_move;
+		U64 temporary_variable_4 = all_coor[i] & white_queen.figure_move;
+		U64 temporary_variable_5 = all_coor[i] & white_king.figure_move;
+		U64 temporary_variable_6 = all_coor[i] & white_pawn.figure_move;
+
+		U64 temporary_variable_11 = all_coor[i] & black_knight.figure_move;
+		U64 temporary_variable_12 = all_coor[i] & black_bishop.figure_move;
+		U64 temporary_variable_13 = all_coor[i] & black_rook.figure_move;
+		U64 temporary_variable_14 = all_coor[i] & black_queen.figure_move;
+		U64 temporary_variable_15 = all_coor[i] & black_king.figure_move;
+		U64 temporary_variable_16 = all_coor[i] & black_pawn.figure_move;
+		
+		////generation of valid moves and attax form array
+		////Then completely change
+
+		if (temporary_variable_1 != 0)
+		{
+			white_knight.processed_move.push_back(i);
+			attacks_from[white_knight.icoor] &= temporary_variable_1;
+			attacks_to[i] &= white_knight.ucoor;
+			white_bishop.processed_move.push_back(i);
+			attacks_from[white_bishop.icoor] &= temporary_variable_2;
+			attacks_to[i] &= white_bishop.ucoor;
+			white_rook.processed_move.push_back(i);
+			attacks_from[white_rook.icoor] &= temporary_variable_3;
+			attacks_to[i] &= white_rook.ucoor;
+			white_queen.processed_move.push_back(i);
+			attacks_from[white_queen.icoor] &= temporary_variable_4;
+			attacks_to[i] &= white_queen.ucoor;
+			white_knight.processed_move.push_back(i);
+			attacks_from[white_king.icoor] &= temporary_variable_5;
+			attacks_to[i] &= white_king.ucoor;
+			white_pawn.processed_move.push_back(i);
+			attacks_from[white_pawn.icoor] &= temporary_variable_6;
+			attacks_to[i] &= white_pawn.ucoor;
+
+			black_knight.processed_move.push_back(i);
+			attacks_from[black_knight.icoor] &= temporary_variable_11;
+			attacks_to[i] &= black_knight.ucoor;
+			black_bishop.processed_move.push_back(i);
+			attacks_from[black_bishop.icoor] &= temporary_variable_12;
+			attacks_to[i] &= black_bishop.ucoor;
+			black_rook.processed_move.push_back(i);
+			attacks_from[black_rook.icoor] &= temporary_variable_13;
+			attacks_to[i] &= black_rook.ucoor;
+			black_queen.processed_move.push_back(i);
+			attacks_from[black_queen.icoor] &= temporary_variable_14;
+			attacks_to[i] &= black_queen.ucoor;
+			black_knight.processed_move.push_back(i);
+			attacks_from[black_king.icoor] &= temporary_variable_15;
+			attacks_to[i] &= black_king.ucoor;
+			black_pawn.processed_move.push_back(i);
+			attacks_from[black_pawn.icoor] &= temporary_variable_16;
+			attacks_to[i] &= black_pawn.ucoor;
+
+			temporary_variable_1 = 0;
+			temporary_variable_2 = 0;
+			temporary_variable_3 = 0;
+			temporary_variable_4 = 0;
+			temporary_variable_5 = 0;
+			temporary_variable_6 = 0;
+			temporary_variable_11 = 0;
+			temporary_variable_12 = 0;
+			temporary_variable_13 = 0;
+			temporary_variable_14 = 0;
+			temporary_variable_15 = 0;
+			temporary_variable_16 = 0;
+		}
+	}
+
+}
+
+U64 BitBoard::blockers(U64 move_npr)
+{
+	for (int i = 0; i < 64; i++)
+	{
+		if (((move_npr) & all_occupied) != 0)
+		{
+			return i;
+		}
+	}
+	return 0;
+}
+
+void BitBoard::init_attacks_to(int icoor, U64 move_legacy)
+{
+	attacks_to[icoor] = move_legacy;
+}
+
+void BitBoard::init_attacks_from(int icoor, U64 move_legacy)
+{
+	//////////сделать определение с единицами, где стоит фигура атакающая нас
+}
+
 void BitBoard::init_all_bitboard()
 {
 	white_occupied = white_pawn.ucoor | white_knight.ucoor |  white_bishop.ucoor 
@@ -172,11 +279,13 @@ void BitBoard::init_all_bitboard()
 
 	black_occupied = black_pawn.ucoor | black_knight.ucoor | black_bishop.ucoor
 		| black_rook.ucoor | black_queen.ucoor | black_king.ucoor;
+
+	all_occupied = white_occupied | black_occupied;
 }
 
 void BitBoard::init_all_coor_bitboard()
 {
-	U64 all_coor[64] = {
+	static U64 all_coor[64] = {
 		1, 2, 4, 8, 16, 32, 64, 128,
 		256, 512, 1024, 2048, 4096, 8192, 16384, 32768,
 		65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608,
@@ -199,7 +308,19 @@ U64 BitBoard::init_knight_move(int icoor)
 		288234782788157440, 576469569871282176, 1224997833292120064, 2449995666584240128, 4899991333168480256, 9800114573372555264, 1152939715268182016, 2305878331024736256,
 		1128098930098176, 2257297371824128, 4796069720358912, 9592139440717824, 19184278881435648, 38368557762871296, 4679521487814656, 9077567998918656
 	};
-	return knight_attacks[icoor];
+
+	U64 move_legacy;
+
+	if ((color_move % 2) == 0)
+	{
+		move_legacy = (knight_attacks[icoor] | white_occupied) ^ black_occupied;
+	}
+	else
+	{
+		move_legacy = (knight_attacks[icoor] | black_occupied) ^ white_occupied;
+	}
+
+	return move_legacy;
 }
 
 
@@ -249,7 +370,24 @@ U64 BitBoard::init_lines_attacks(int icoor)
 		282578800148737, 565157600297474, 1130315200594948, 2260630401189896, 4521260802379792, 9042521604759584, 18085043209519168, 36170086419038336,
 	};
 
-	return plus1[icoor] | minus1[icoor] | plus8[icoor] | minus8[icoor];
+	U64 move_legacy;
+
+	if ((color_move % 2) == 0)
+	{
+		U64 move_legacy = ((plus1[icoor] ^ blockers(plus1[icoor]) | minus1[icoor] ^ blockers(minus1[icoor]) |
+			plus8[icoor] ^ blockers(plus8[icoor]) | minus8[icoor] ^ blockers(minus8[icoor]))
+			| white_occupied) ^ (black_occupied);		 
+	}
+	else
+	{
+		U64 move_legacy = ((plus1[icoor] ^ blockers(plus1[icoor]) | minus1[icoor] ^ blockers(minus1[icoor]) |
+			plus8[icoor] ^ blockers(plus8[icoor]) | minus8[icoor] ^ blockers(minus8[icoor]))
+			| black_occupied) ^ (white_occupied);
+	}
+
+	U64 blockers;
+
+	return move_legacy;
 }
 U64 BitBoard::init_diag_attacks(int icoor)
 {
@@ -297,15 +435,126 @@ U64 BitBoard::init_diag_attacks(int icoor)
 		567382630219904,1134765260439552,2269530520813568,4539061024849920,9078117754732544,18155135997837312,36028797018963968,0
 	};
 
-	return plus9[icoor] | plus7[icoor] | minus9[icoor] | minus7[icoor];
+	U64 move_legacy;
+
+	if ((color_move % 2) == 0)
+	{
+		U64 move_legacy = ((plus7[icoor] ^ blockers(plus7[icoor]) | minus7[icoor] ^ blockers(minus7[icoor]) |
+			plus9[icoor] ^ blockers(plus9[icoor]) | minus9[icoor] ^ blockers(minus9[icoor]))
+			| white_occupied) ^ (black_occupied);
+	}
+	else
+	{
+		U64 move_legacy = ((plus7[icoor] ^ blockers(plus7[icoor]) | minus7[icoor] ^ blockers(minus7[icoor]) |
+			plus9[icoor] ^ blockers(plus9[icoor]) | minus9[icoor] ^ blockers(minus9[icoor]))
+			| black_occupied) ^ (white_occupied);
+	}
+
+	return move_legacy;
+}
+
+void BitBoard::do_half_move()
+{
+	srand(time(NULL));
+
+	int figure = rand() % 12;
+
+	switch (figure)
+	{
+	case 1:
+		int size = white_knight.processed_move.size();
+		int random = rand() % size;
+		white_knight.icoor = white_knight.processed_move[random];
+
+		if ((white_knight.icoor & black_occupied) != 0)
+		{
+			black_occupied ^= white_knight.icoor;
+
+			black_knight.icoor ^= white_knight.icoor;
+			black_bishop.icoor ^= white_knight.icoor;
+			black_rook.icoor ^= white_knight.icoor;
+			black_queen.icoor ^= white_knight.icoor;
+			black_king.icoor ^= white_knight.icoor; //?????
+			black_pawn.icoor ^= white_knight.icoor;
+		}
+		break;
+	case 2:
+		int size = white_bishop.processed_move.size();
+		int random = rand() % size;
+		white_bishop.icoor = white_bishop.processed_move[random];
+		break;
+	case 3:
+		int size = white_rook.processed_move.size();
+		int random = rand() % size;
+		white_rook.icoor = white_rook.processed_move[random];
+		break;
+	case 4:
+		int size = white_queen.processed_move.size();
+		int random = rand() % size;
+		white_queen.icoor = white_queen.processed_move[random];
+		break;
+	case 5:
+		int size = white_king.processed_move.size();
+		int random = rand() % size;
+		white_king.icoor = white_king.processed_move[random];
+		break;
+	case 6:
+		int size = white_pawn.processed_move.size();
+		int random = rand() % size;
+		white_pawn.icoor = white_pawn.processed_move[random];
+		break;
+	case 7:
+		int size = black_knight.processed_move.size();
+		int random = rand() % size;
+		black_knight.icoor = black_knight.processed_move[random];
+		break;
+	case 8:
+		int size = black_bishop.processed_move.size();
+		int random = rand() % size;
+		black_bishop.icoor = black_bishop.processed_move[random];
+		break;
+	case 9:
+		int size = black_rook.processed_move.size();
+		int random = rand() % size;
+		black_rook.icoor = black_rook.processed_move[random];
+		break;
+	case 10:
+		int size = black_queen.processed_move.size();
+		int random = rand() % size;
+		black_queen.icoor = black_queen.processed_move[random];
+		break;
+	case 11:
+		int size = black_king.processed_move.size();
+		int random = rand() % size;
+		black_king.icoor = black_king.processed_move[random];
+		break;
+	case 12:
+		int size = black_pawn.processed_move.size();
+		int random = rand() % size;
+		black_pawn.icoor = black_pawn.processed_move[random];
+		break;
+	default:
+		break;
+	}
+}
+
+void BitBoard::read_fen()
+{
+	///
 }
 
 void BoardUnitTest_001()
 {
 }
 
+void BoardUnitTest_003()
+{
+
+}
+
 void BoardUnitTest()
 {
-	BoardUnitTest_001();
-
+	//BoardUnitTest_001();
+	//BoardUnitTest_002();
+	//BoardUnitTest_003();
 }
