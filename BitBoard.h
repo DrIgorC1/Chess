@@ -53,7 +53,6 @@ private:
 	U64 attacks_to[64];
 
 public:
-
 	BitBoard();
 	BitBoard(std::string fen);
 
@@ -87,10 +86,9 @@ public:
 	U64 init_knight_move(int icoor);
 	U64 init_lines_attacks(int icoor);
 	U64 init_diag_attacks(int icoor);
+	U64 init_king_attacks(int coor);
+	/*void do_half_move();*/
 
-	void do_half_move();///
-
-	void read_fen();
 };
 
 void BoardUnitTest();
