@@ -375,7 +375,7 @@ U64 BitBoard::init_blackpawn_move(int icoor)
 	return U64();
 }
 
-void BitBoard::generate()
+void BitBoard::generate()//GENERATE MOVE/ in example ok,but this not ok
 {
 	for (int i = 0; i < 8; i++)
 	{
