@@ -155,42 +155,50 @@ U64 BitBoard::init_diag_move(int icoor)
 
 	lines_attacks = plus9[icoor];
 	blockers = (lines_attacks & occupied);
+
 	if (blockers == 0)
 	{
 		_BitScanForward64(&blocking_square, blockers);
 		lines_attacks ^= plus9[blocking_square];
 		lines_attacks ^= occupied;
 	}
+
 	bishop_attacks = lines_attacks;
 
 	lines_attacks = plus7[icoor];
 	blockers = lines_attacks & occupied;
+
 	if (blockers != 0)
 	{
 		_BitScanForward64(&blocking_square, blockers);
 		lines_attacks ^= plus7[blocking_square];
 		lines_attacks ^= occupied;
 	}
+
 	bishop_attacks |= lines_attacks;
 
 	lines_attacks = minus9[icoor];
 	blockers = lines_attacks & occupied;
+
 	if (blockers != 0)
 	{
 		_BitScanForward64(&blocking_square, blockers);
 		lines_attacks ^= minus9[blocking_square];
 		lines_attacks ^= occupied;
 	}
+
 	bishop_attacks |= lines_attacks;
 
 	lines_attacks = minus7[icoor];
 	blockers = lines_attacks & occupied;
+
 	if (blockers != 0)
 	{
 		_BitScanForward64(&blocking_square, blockers);
 		lines_attacks ^= minus7[blocking_square];
 		lines_attacks ^= occupied;
 	}
+
 	bishop_attacks |= lines_attacks;
 
 	return bishop_attacks;
@@ -433,8 +441,11 @@ void BitBoard::conformityf(int icoor)
 	//std::cout << white_rook.figure_move % 2;
 	//white_rook.figure_move /= 2;
 	//}
+
 	std::cout << std::endl << std::endl;
+
 	int j = 0;
+	
 	for (int i = 0; i < 64; i++)
 	{
 		if ((conformity[i].first & white_rook.figure_move) != 0)
@@ -460,6 +471,7 @@ void BitBoard::check_win()
 void BitBoard::print_bboard()
 {
 	all_occupied = white_occupied | black_occupied;
+
 	for (int i = 0; i < 64; i++)
 	{
 		if ((((i) % 8) == 0) && i != 0)
@@ -469,4 +481,129 @@ void BitBoard::print_bboard()
 		std::cout << all_occupied % 2;
 		all_occupied /= 2;
 	}
+}
+
+void BoardUnitTest_001()
+{
+	unsigned long long int plus1[64] = {
+	254, 252, 248, 240, 224, 192, 128, 0,
+	65024, 64512, 63488, 61440, 57344, 49152, 32768, 0,
+	16646144, 16515072, 16252928, 15728640, 14680064, 12582912, 8388608, 0 ,
+	4261412864, 4227858432, 4160749568, 4026531840, 3758096384, 3221225472, 2147483648, 0,
+	1090921693184, 1082331758592, 1065151889408, 1030792151040, 962072674304, 824633720832, 549755813888, 0,
+	279275953455104, 277076930199552, 272678883688448, 263882790666240, 246290604621824, 211106232532992, 140737488355328, 0,
+	71494644084506624, 70931694131085312, 69805794224242688, 67553994410557440, 63050394783186944, 54043195528445952, 36028797018963968, 0,
+	18302628885633695744, 18158513697557839872, 17870283321406128128, 17293822569102704640, 16140901064495857664, 13835058055282163712, 9223372036854775808, 0
+	};
+
+	unsigned long long int minus1[64] = {
+		0, 1, 3, 7, 15, 31, 63, 127,
+		0, 256, 768, 1792, 3840, 7936, 16128, 32512,
+		0, 65536, 196608, 458752, 983040, 2031616, 4128768, 8323072,
+		0, 16777216, 50331648, 117440512, 251658240, 520093696, 1056964608, 2130706432,
+		0, 4294967296, 12884901888, 30064771072, 64424509440, 133143986176, 270582939648, 545460846592,
+		0, 1099511627776, 3298534883328, 7696581394432, 16492674416640, 34084860461056, 69269232549888, 139637976727552,
+		0, 281474976710656, 844424930131968, 1970324836974592, 4222124650659840, 8725724278030336, 17732923532771328, 35747322042253312,
+		0, 72057594037927936, 216172782113783808, 504403158265495552, 1080863910568919040, 2233785415175766016, 4539628424389459968, 9151314442816847872,
+	};
+
+	unsigned long long int plus8[64] = {
+		72340172838076672, 144680345676153344, 289360691352306688, 578721382704613376, 1157442765409226752, 2314885530818453504, 4629771061636907008, 9259542123273814016,
+		72340172838076416, 144680345676152832, 289360691352305664, 578721382704611328, 1157442765409222656, 2314885530818445312, 4629771061636890624, 9259542123273781248,
+		72340172838010880, 144680345676021760, 289360691352043520, 578721382704087040, 1157442765408174080, 2314885530816348160, 4629771061632696320, 9259542123265392640,
+		72340172821233664, 144680345642467328, 289360691284934656, 578721382569869312, 1157442765139738624, 2314885530279477248, 4629771060558954496, 9259542121117908992,
+		72340168526266368, 144680337052532736, 289360674105065472, 578721348210130944, 1157442696420261888, 2314885392840523776, 4629770785681047552, 9259541571362095104,
+		72339069014638592, 144678138029277184, 289356276058554368, 578712552117108736, 1157425104234217472, 2314850208468434944, 4629700416936869888, 9259400833873739776,
+		72057594037927936, 144115188075855872, 288230376151711744, 576460752303423488, 1152921504606846976, 2305843009213693952, 4611686018427387904, 9223372036854775808,
+		0, 0, 0, 0, 0, 0, 0, 0,
+	};
+
+	unsigned long long int minus8[64] = {
+	0, 0, 0, 0, 0, 0, 0, 0,
+	1, 2, 4, 8, 16, 32, 64, 128,
+	257, 514, 1028, 2056, 4112, 8224, 16448, 32896,
+	65793, 131586, 263172, 526344, 1052688, 2105376, 4210752, 8421504,
+	16843009, 33686018, 67372036, 134744072, 269488144, 538976288, 1077952576, 2155905152,
+	4311810305, 8623620610, 17247241220, 34494482440, 68988964880, 137977929760, 275955859520, 551911719040,
+	1103823438081, 2207646876162, 4415293752324, 8830587504648, 17661175009296, 35322350018592, 70644700037184, 141289400074368,
+	282578800148737, 565157600297474, 1130315200594948, 2260630401189896, 4521260802379792, 9042521604759584, 18085043209519168, 36170086419038336,
+	};
+
+	unsigned long long int lines_attacks, blockers;
+
+	unsigned long blocking_square;
+
+	unsigned long long int rook_attacks;
+
+	unsigned long long int occupied = pow(2, 37);
+
+	for (int j = 0; j < 64; j++)
+	{
+		lines_attacks = plus8[j];
+		blockers = lines_attacks & occupied;
+
+		if (blockers != 0)
+		{
+			_BitScanForward64(&blocking_square, blockers);
+			lines_attacks ^= plus8[blocking_square];
+			lines_attacks ^= occupied;
+		}
+
+		rook_attacks = lines_attacks;
+
+		lines_attacks = plus1[j];
+		blockers = lines_attacks & occupied;
+
+		if (blockers != 0)
+		{
+			_BitScanForward64(&blocking_square, blockers);
+			lines_attacks ^= plus1[blocking_square];
+			lines_attacks ^= occupied;
+		}
+
+		rook_attacks |= lines_attacks;
+
+		lines_attacks = minus8[j];
+		blockers = lines_attacks & occupied;
+
+		if (blockers != 0)
+		{
+			_BitScanForward64(&blocking_square, blockers);
+			lines_attacks ^= minus8[blocking_square];
+			lines_attacks ^= occupied;
+		}
+
+		rook_attacks |= lines_attacks;
+
+		lines_attacks = minus1[j];
+		blockers = lines_attacks & occupied;
+		if (blockers != 0)
+		{
+			_BitScanForward64(&blocking_square, blockers);
+			lines_attacks ^= minus1[blocking_square];
+			lines_attacks ^= occupied;
+		}
+
+		rook_attacks |= lines_attacks;
+		rook_attacks |= occupied;
+
+
+		for (int i = 0; i < 64; i++)
+		{
+			if (i % 8 == 0)
+			{
+				std::cout << std::endl;
+			}
+
+			std::cout << rook_attacks % 2;
+			rook_attacks /= 2;
+		}
+		std::cin.get();
+	}
+
+}
+
+void BoardUnitTest()
+{
+	BoardUnitTest_001();
 }
